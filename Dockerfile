@@ -29,6 +29,9 @@ RUN apt-get update \
     # Install git, process tools, lsb-release (common in install instructions for CLIs)
     && apt-get -y install git procps lsb-release \
     #
+    # Install vim
+    && apt-get -y install vim \
+    #
     # Create a non-root user with custom group
     && addgroup --gid $GROUP_ID $DEV_GROUP \
     && adduser --uid $USER_ID --ingroup $DEV_GROUP --home /home/$DEV_USER --shell /bin/bash --disabled-password --gecos "Developer" $DEV_USER \
@@ -58,6 +61,10 @@ USER $DEV_USER:$DEV_GROUP
 
 # Set the default language
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+
+# Set default editor
+ENV VISUAL=vim
+ENV EDITOR=$VISUAL
 
 # Set the default shell to bash rather than sh
 ENV SHELL /bin/bash
