@@ -1,11 +1,13 @@
 FROM ubuntu
 LABEL author="Ruben Suarez <rubensa@gmail.com>"
 
-# Define user and group
-ARG USERNAME=developer
+# Define non-root user and group id's
 ARG USER_ID=1000
-ARG GROUPNAME=developers
 ARG GROUP_ID=$USER_ID
+
+# Define non-root user and group names
+ENV DEV_USER=developer
+ENV DEV_GROUP=developers
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
@@ -28,20 +30,20 @@ RUN apt-get update \
     && apt-get -y install git procps lsb-release \
     #
     # Create a non-root user with custom group
-    && addgroup --gid $GROUP_ID $GROUPNAME \
-    && adduser --uid $USER_ID --ingroup $GROUPNAME --home /home/$USERNAME --shell /bin/bash --disabled-password --gecos "Developer" $USERNAME \
+    && addgroup --gid $GROUP_ID $DEV_GROUP \
+    && adduser --uid $USER_ID --ingroup $DEV_GROUP --home /home/$DEV_USER --shell /bin/bash --disabled-password --gecos "Developer" $DEV_USER \
     #
     # Add sudo support for non-root user
     && apt-get install -y sudo \
-    && echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
-    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && echo "$DEV_USER ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$DEV_USER \
+    && chmod 0440 /etc/sudoers.d/$DEV_USER \
     #
     # Add fixuid
     && curl -SsL https://github.com/boxboat/fixuid/releases/download/v0.4/fixuid-0.4-linux-amd64.tar.gz | tar -C /usr/local/bin -xzf - \
     && chown root:root /usr/local/bin/fixuid \
     && chmod 4755 /usr/local/bin/fixuid \
     && mkdir -p /etc/fixuid \
-    && printf "user: $USERNAME\ngroup: $GROUPNAME\npaths:\n  - /home/$USERNAME" > /etc/fixuid/config.yml \
+    && printf "user: $DEV_USER\ngroup: $DEV_GROUP\npaths:\n  - /home/$DEV_USER" > /etc/fixuid/config.yml \
     #
     # Clean up
     && apt-get autoremove -y \
@@ -51,8 +53,8 @@ RUN apt-get update \
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=
 
-# Tell docker that all future commands should be run as the user
-USER $USERNAME:$GROUPNAME
+# Tell docker that all future commands should be run as the non-root user
+USER $DEV_USER:$DEV_GROUP
 
 # Set the default language
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
@@ -61,7 +63,7 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 ENV SHELL /bin/bash
 
 # Set user home directory (see: https://github.com/microsoft/vscode-remote-release/issues/852)
-ENV HOME /home/$USERNAME
+ENV HOME /home/$DEV_USER
 
 # Set default working directory to user home directory
 WORKDIR $HOME
