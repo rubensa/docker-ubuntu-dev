@@ -63,14 +63,13 @@ USER $DEV_USER:$DEV_GROUP
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
 # Set default editor
-ENV VISUAL=vim
-ENV EDITOR=$VISUAL
+ENV VISUAL=vim EDITOR=$VISUAL
 
 # Set the default shell to bash rather than sh
-ENV SHELL /bin/bash
+ENV SHELL=/bin/bash
 
 # Set user home directory (see: https://github.com/microsoft/vscode-remote-release/issues/852)
-ENV HOME /home/$DEV_USER
+ENV HOME=/home/$DEV_USER
 
 # Set default working directory to user home directory
 WORKDIR $HOME
