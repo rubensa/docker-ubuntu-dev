@@ -103,6 +103,10 @@ ENV HOME=/home/${DEV_USER}
 # Set default working directory to user home directory
 WORKDIR ${HOME}
 
+# Set default non-root user umask to 002 to give group all file permissions
+# Allow override by setting UMASK_SET environment variable
+RUN printf "\nUMASK_SET=\${UMASK_SET:-002}\numask \"\$UMASK_SET\"\n" >> ~/.bashrc
+
 # Allways run fixuid
 ENTRYPOINT ["fixuid"]
 
