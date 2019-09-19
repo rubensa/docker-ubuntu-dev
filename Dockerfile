@@ -2,17 +2,11 @@ FROM ubuntu
 LABEL author="Ruben Suarez <rubensa@gmail.com>"
 
 # Define non-root user and group id's
-ARG DEV_USER_ID=2000
-ARG DEV_GROUP_ID=2000
-
-# Define shared group id
-ARG SHARED_GROUP_ID=2001
+ARG DEV_USER_ID=1000
+ARG DEV_GROUP_ID=1000
 
 # Define non-root user and group names
 ENV DEV_USER=developer DEV_GROUP=developers
-
-# Define shared group and folder
-ENV SHARED_GROUP=shared SHARED_FOLDER=/shared
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
@@ -22,9 +16,6 @@ RUN apt-get update \
     # 
     # Basic apt configuration
     && apt-get -y install --no-install-recommends apt-utils dialog 2>&1 \
-    # 
-    # Install ACL
-    && apt-get -y install acl \
     #
     # Configure locale
     && apt-get install -y locales \
@@ -44,30 +35,9 @@ RUN apt-get update \
     && addgroup --gid ${DEV_GROUP_ID} ${DEV_GROUP} \
     && adduser --uid ${DEV_USER_ID} --ingroup ${DEV_GROUP} --home /home/${DEV_USER} --shell /bin/bash --disabled-password --gecos "Developer" ${DEV_USER} \
     #
-    # Create shared group
-    && addgroup --gid ${SHARED_GROUP_ID} ${SHARED_GROUP} \
-    #
-    # Assign non-root user to shared group
-    && usermod -a -G ${SHARED_GROUP} ${DEV_USER} \
-    #
-    # Create shared folder
-    && mkdir -p ${SHARED_FOLDER} \
-    #
-    # Assign dev group folder ownership
-    && chgrp ${SHARED_GROUP} ${SHARED_FOLDER} \
-    #
-    # Set the segid bit to the folder
-    && chmod g+s ${SHARED_FOLDER} \
-    #
-    # Give write acces to the group
-    && chmod g+w ${SHARED_FOLDER} \
-    #
-    # Set ACL to files created in the folder
-    && setfacl -d -m u::rwx,g::rwx,o::r-x ${SHARED_FOLDER} \
-    #
     # Add sudo support for non-root user
     && apt-get install -y sudo \
-    && echo "${DEV_USER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${DEV_USER} \
+    && echo "${DEV_USER} ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers.d/${DEV_USER} \
     && chmod 0440 /etc/sudoers.d/${DEV_USER} \
     #
     # Add fixuid

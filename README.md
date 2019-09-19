@@ -13,9 +13,7 @@ docker run --rm -it \
 	-v $(pwd):/home/developer/work \
 	-w /home/developer/work \
 	-u $(id -u $USERNAME):$(id -g $USERNAME) \
-	--group-add shared \
 	rubensa/ubuntu-dev
 ```
 
 This way, any file created in the container initial working directory is written and owned by current host user:group launching the container
-(and the internal "shared" group is added to keep access to shared "/shared" folder -usefull to install shared software with "shared" group permissions-).
