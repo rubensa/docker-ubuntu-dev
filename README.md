@@ -1,3 +1,6 @@
+| ⚠ **WARNING**: This image is obsolete and has been superseded by [rubensa/ubuntu-tini-dev](https://github.com/rubensa/docker-ubuntu-tini-dev). |
+| --- |
+
 # Ubuntu image for local development
 
 This image provides an Ubuntu environment useful for local development purposes.
